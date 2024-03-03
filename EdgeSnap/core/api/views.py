@@ -5,9 +5,9 @@ from rest_framework.decorators import api_view
 
 
 @api_view(['GET'])
-def getRoutes(request):
+def get_routes(request):
     routes = [
-        '/api/token/',
-        '/api/token/refresh/',
+        '/api/get-routes/',
+        '/api/',
     ]
     return Response(routes)
