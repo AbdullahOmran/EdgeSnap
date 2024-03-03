@@ -19,7 +19,7 @@ def get_routes(request):
 
 
 @api_view(['POST'])
-def add_noise(request):
+def load_img(request):
     pass
 
 @api_view(['POST'])
