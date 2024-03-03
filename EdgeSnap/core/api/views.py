@@ -42,7 +42,6 @@ def get_grayscale(request):
         img = cv.imread(filename)
         gray_image = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         cv.imwrite(filename, gray_image)
-
     except UserImage.DoesNotExist:
         return Response(status.HTTP_404_NOT_FOUND)
 
