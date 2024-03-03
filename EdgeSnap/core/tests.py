@@ -1,6 +1,8 @@
 
 # Create your tests here.
 import requests
+import cv2 as cv
+import numpy as np
 
 res = requests.post('http://localhost:8000/api/token/', data={
     'username': 'AbdullahOmran',
@@ -22,4 +24,11 @@ res = requests.post('http://localhost:8000/api/upload-image/', files=files, head
 
 res = requests.get('http://localhost:8000/api/get-grayscale/', headers=headers)
 
-print(res.status_code)
+index = res.headers.get('Content-Type').find('/')+1
+out_file = 'output.'+res.headers.get('Content-Type')[index:]
+
+img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+cv.imshow(out_file,image)
+cv.waitKey(0)
+cv.destroyAllWindows()

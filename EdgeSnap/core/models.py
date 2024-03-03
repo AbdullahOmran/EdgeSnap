@@ -9,9 +9,13 @@ import os
 class UserImage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
+    out_image = models.ImageField(upload_to='images/', null=True, blank=True)
 
 @receiver(pre_delete, sender=UserImage)
 def delete_image(sender, instance, **kwargs):
     if instance.image:
         if os.path.isfile(instance.image.path):
             os.remove(instance.image.path)
+    if instance.out_image:
+        if os.path.isfile(instance.out_image.path):
+            os.remove(instance.out_image.path)
