@@ -20,4 +20,6 @@ files = {
 
 res = requests.post('http://localhost:8000/api/upload-image/', files=files, headers=headers)
 
+res = requests.get('http://localhost:8000/api/get-grayscale/', headers=headers)
 
+print(res.status_code)

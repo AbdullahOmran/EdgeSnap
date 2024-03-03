@@ -7,7 +7,7 @@ from .serializers import MyTokenObtainPairSerializer
 from ..models import UserImage
 from rest_framework import status
 import cv2 as cv
-
+import numpy as np
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -33,8 +33,17 @@ def upload_img(request):
     instance.save()
     return Response(status.HTTP_201_CREATED)
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_grayscale(request):
-    print (request.data)
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.image)
+        img = cv.imread(filename)
+        gray_image = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        cv.imwrite(filename, gray_image)
+
+    except UserImage.DoesNotExist:
+        return Response(status.HTTP_404_NOT_FOUND)
+
     return Response(status.HTTP_200_OK)
