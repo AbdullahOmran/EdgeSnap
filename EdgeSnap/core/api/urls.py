@@ -8,5 +8,7 @@ urlpatterns = [
     path('get-routes/', views.get_routes),
     path('get-grayscale/', views.get_grayscale),
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('upload-image/', views.upload_img),
+    path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

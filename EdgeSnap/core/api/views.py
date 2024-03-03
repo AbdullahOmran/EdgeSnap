@@ -1,7 +1,10 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import MyTokenObtainPairSerializer
+
+from ..models import UserImage
 from rest_framework import status
 import cv2 as cv
 
@@ -10,6 +13,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_routes(request):
     routes = [
         '/api/get-routes/',
@@ -19,10 +23,18 @@ def get_routes(request):
 
 
 @api_view(['POST'])
-def load_img(request):
-    pass
+@permission_classes([IsAuthenticated])
+def upload_img(request):
+    images = UserImage.objects.filter(user=request.user)
+    if images.count() > 0:
+        for image in images:
+            image.delete()
+    instance = UserImage(user=request.user, image=request.FILES['image'])
+    instance.save()
+    return Response(status.HTTP_201_CREATED)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def get_grayscale(request):
     print (request.data)
     return Response(status.HTTP_200_OK)

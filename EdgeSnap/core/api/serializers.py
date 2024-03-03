@@ -18,3 +18,9 @@ class UserImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserImage
         fields = '__all__'
+    
+    def validate(self, data):
+        request = self.context['request']
+        if not request.FILES:
+            raise serializers.ValidationError("An image must be provided")
+        return data
