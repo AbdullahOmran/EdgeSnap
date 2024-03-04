@@ -52,3 +52,9 @@ def get_grayscale(request):
         return Response(status.HTTP_404_NOT_FOUND)
 
     return Response(status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def add_noise(request):
+    pass
+
