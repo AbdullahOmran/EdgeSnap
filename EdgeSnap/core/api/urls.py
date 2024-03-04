@@ -10,5 +10,5 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('upload-image/', views.upload_img),
     path('get-grayscale/', views.get_grayscale),
-    path('add-noise/', views.add_noise),
+    path('add-gaussian-noise/<str:mean>/<str:std>/', views.add_gaussian_noise),
 ]

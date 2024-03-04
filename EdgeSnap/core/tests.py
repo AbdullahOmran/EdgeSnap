@@ -22,13 +22,35 @@ files = {
 
 res = requests.post('http://localhost:8000/api/upload-image/', files=files, headers=headers)
 
-res = requests.get('http://localhost:8000/api/get-grayscale/', headers=headers)
 
-index = res.headers.get('Content-Type').find('/')+1
-out_file = 'output.'+res.headers.get('Content-Type')[index:]
 
-img_bytes = np.frombuffer(res.content, dtype=np.uint8)
-image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
-cv.imshow(out_file,image)
-cv.waitKey(0)
-cv.destroyAllWindows()
+def test_get_grayscale():
+    res = requests.get('http://localhost:8000/api/get-grayscale/', headers=headers)
+
+    index = res.headers.get('Content-Type').find('/')+1
+    out_file = 'output.'+res.headers.get('Content-Type')[index:]
+
+    img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+    image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+    cv.imshow(out_file,image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+def test_add_gaussian_noise():
+    mean = 11111
+    std = 22222
+    # payload = {
+    #     'mean': mean,
+    #     'std': std,
+    # }
+    res = requests.get(f'http://localhost:8000/api/add-gaussian-noise/{mean}/{std}/', headers=headers)
+
+    index = res.headers.get('Content-Type').find('/')+1
+    out_file = 'output.'+res.headers.get('Content-Type')[index:]
+    img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+    image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+    cv.imshow(out_file,image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+test_add_noise()

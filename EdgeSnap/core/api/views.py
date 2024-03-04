@@ -55,6 +55,30 @@ def get_grayscale(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def add_noise(request):
-    pass
+def add_gaussian_noise(request, mean, std):
+    print(mean)
+    print(std)
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.image)
+        out_file = str(user_image.out_image)
+        img = cv.imread(filename)
+        if method == 'uniform':
+            pass
+        elif method == 'gaussian':
+            pass
+        elif method == 'salt':
+            pass
+        elif method == 'pepper':
+            pass
+
+        cv.imwrite(out_file, gray_image)
+        user_image.save()
+        with open(out_file, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status.HTTP_404_NOT_FOUND)
+
+    return Response(status.HTTP_200_OK)
 
