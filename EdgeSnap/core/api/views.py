@@ -112,3 +112,39 @@ def add_uniform_noise(request):
 
     return Response(status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def add_salt_and_pepper_noise(request):
+    saltiness = request.GET.get('saltiness',None)
+    pepperiness = request.GET.get('pepperiness',None)
+    if saltiness is None and pepperiness is None:
+        return Response(status.HTTP_400_BAD_REQUEST)
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.image)
+        out_file = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        noisy_image = np.copy(gray_image)
+        width,height = gray_image.shape
+        if saltiness is not None:
+            saltiness = float(saltiness)
+            num_salt = np.floor(gray_image.size * saltiness)
+            salt_x_vector = np.random.randint(0,width, int(num_salt))
+            salt_y_vector = np.random.randint(0,height, int(num_salt))
+            noisy_image[salt_x_vector, salt_y_vector] = 255
+        if pepperiness is not None:
+            pepperiness = float(pepperiness)
+            num_pepper = np.floor(gray_image.size * pepperiness)
+            pepper_x_vector = np.random.randint(0,width, int(num_pepper))
+            pepper_y_vector = np.random.randint(0,height, int(num_pepper))
+            noisy_image[pepper_x_vector, pepper_y_vector] = 0
+
+        cv.imwrite(out_file, noisy_image)
+        user_image.save()
+        with open(out_file, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status.HTTP_404_NOT_FOUND)
+

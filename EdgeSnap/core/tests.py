@@ -70,5 +70,23 @@ def test_add_uniform_noise():
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-test_add_uniform_noise()
+def test_add_salt_and_pepper_noise():
+    saltiness = 0.5
+    pepperiness = 0.5
+    payload = {
+        'saltiness': saltiness,
+        'pepperiness': pepperiness
+    }
+    res = requests.get('http://localhost:8000/api/add-salt-and-pepper-noise/',params=payload, headers=headers)
+
+    index = res.headers.get('Content-Type').find('/')+1
+    out_file = 'output.'+res.headers.get('Content-Type')[index:]
+    img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+    image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+    cv.imshow(out_file,image)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+test_add_salt_and_pepper_noise()
+
+
 
