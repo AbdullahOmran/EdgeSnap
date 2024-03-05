@@ -13,4 +13,5 @@ urlpatterns = [
     path('add-gaussian-noise/', views.add_gaussian_noise),
     path('add-uniform-noise/', views.add_uniform_noise),
     path('add-salt-and-pepper-noise/', views.add_salt_and_pepper_noise),
+    path('blur/', views.blur),
 ]
