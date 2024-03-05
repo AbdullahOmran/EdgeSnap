@@ -55,24 +55,54 @@ def get_grayscale(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def add_gaussian_noise(request, mean, std):
-    print(mean)
-    print(std)
+def add_gaussian_noise(request):
+    mean = request.GET.get('mean',None)
+    std = request.GET.get('std',None)
+    if std is None or mean is None:
+        return Response(status.HTTP_400_BAD_REQUEST)
+    mean = float(mean)
+    std = float(std)
     try:
         user_image = UserImage.objects.get(user = request.user)
         filename = str(user_image.image)
         out_file = str(user_image.out_image)
         img = cv.imread(filename)
-        if method == 'uniform':
-            pass
-        elif method == 'gaussian':
-            pass
-        elif method == 'salt':
-            pass
-        elif method == 'pepper':
-            pass
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        row,col = gray_image.shape
+        noise = np.random.normal(mean,std, (row,col))
+        noisy_image = gray_image + noise
+        noisy_image = np.clip(noisy_image,0,255).astype(np.uint8)
+        cv.imwrite(out_file, noisy_image)
+        user_image.save()
+        with open(out_file, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status.HTTP_404_NOT_FOUND)
 
-        cv.imwrite(out_file, gray_image)
+    return Response(status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def add_uniform_noise(request):
+    low = request.GET.get('low',None)
+    high = request.GET.get('high',None)
+    if low is None or high is None:
+        return Response(status.HTTP_400_BAD_REQUEST)
+    low = float(low)
+    high = float(high)
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.image)
+        out_file = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        row,col = gray_image.shape
+        noise = np.random.uniform(low,high, (row,col))
+        noisy_image = gray_image + noise
+        noisy_image = np.clip(noisy_image,0,255).astype(np.uint8)
+        cv.imwrite(out_file, noisy_image)
         user_image.save()
         with open(out_file, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
