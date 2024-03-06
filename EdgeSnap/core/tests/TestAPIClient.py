@@ -18,6 +18,7 @@ class TestAPIClient(object):
             'add-uniform-noise':f'{self.BASE_URL}/api/add-uniform-noise/',
             'add-salt-and-pepper-noise':f'{self.BASE_URL}/add-salt-and-pepper-noise/',
             'blur':f'{self.BASE_URL}/blur/',
+            'gaussian-blur':f'{self.BASE_URL}/gaussian-blur/',
         }
         res = requests.post(self.reverse('token'), data={
             'username': 'AbdullahOmran',
@@ -103,6 +104,21 @@ class TestAPIClient(object):
 
         }
         res = requests.get(self.reverse('blur'),params=payload, headers=self.headers)
+
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_gaussian_blur(self, kernel_size = 3, std = 1):
+        payload = {
+            'kernel': kernel_size,
+            'std':std,
+        }
+        res = requests.get(self.reverse('gaussian-blur'),params=payload, headers=self.headers)
 
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
