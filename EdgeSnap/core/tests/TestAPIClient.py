@@ -20,6 +20,7 @@ class TestAPIClient(object):
             'blur':f'{self.BASE_URL}/blur/',
             'gaussian-blur':f'{self.BASE_URL}/gaussian-blur/',
             'median-blur':f'{self.BASE_URL}/median-blur/',
+            'sobel-edge-detection':f'{self.BASE_URL}/sobel-edge-detection/',
         }
 
         res = requests.post(self.reverse('token'), data={
@@ -136,6 +137,16 @@ class TestAPIClient(object):
         }
         res = requests.get(self.reverse('median-blur'),params=payload, headers=self.headers)
 
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_sobel_edge_detection(self):
+        res = requests.get(self.reverse('sobel-edge-detection'), headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
         img_bytes = np.frombuffer(res.content, dtype=np.uint8)

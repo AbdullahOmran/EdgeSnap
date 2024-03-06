@@ -16,4 +16,5 @@ urlpatterns = [
     path('blur/', views.blur, name = 'blur'),
     path('gaussian-blur/', views.gaussian_blur, name = 'gaussian-blur'),
     path('median-blur/', views.median_blur, name = 'median-blur'),
+    path('sobel-edge-detection/', views.sobel_edge_detection, name = 'sobel-edge-detection'),
 ]

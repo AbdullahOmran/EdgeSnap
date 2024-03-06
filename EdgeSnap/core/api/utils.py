@@ -22,3 +22,14 @@ def apply_median_blur(image, kernel_size):
             blurred_image[i, j] = np.median(neighborhood)
     
     return blurred_image.astype(np.uint8)
+
+def apply_sobel_edge_detection(gray_image):
+   
+    sobel_x = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
+    sobel_y = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
+    gradient_x = cv.filter2D(src = gray_image,kernel=sobel_x,anchor=(-1,-1), ddepth = -1)
+    gradient_y = cv.filter2D(src = gray_image,kernel=sobel_y,anchor=(-1,-1), ddepth = -1)
+    magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
+    magnitude *= 255.0 / np.max(magnitude)
+    
+    return magnitude.astype(np.uint8)
