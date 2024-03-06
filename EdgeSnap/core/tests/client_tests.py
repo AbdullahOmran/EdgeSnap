@@ -5,3 +5,4 @@ client_test = TestAPIClient()
 
 client_test.test_gaussian_blur()
 client_test.test_get_grayscale()
+client_test.test_median_blur()

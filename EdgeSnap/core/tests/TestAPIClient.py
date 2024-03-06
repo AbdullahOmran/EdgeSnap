@@ -19,7 +19,9 @@ class TestAPIClient(object):
             'add-salt-and-pepper-noise':f'{self.BASE_URL}/add-salt-and-pepper-noise/',
             'blur':f'{self.BASE_URL}/blur/',
             'gaussian-blur':f'{self.BASE_URL}/gaussian-blur/',
+            'median-blur':f'{self.BASE_URL}/median-blur/',
         }
+
         res = requests.post(self.reverse('token'), data={
             'username': 'AbdullahOmran',
             'password': '123456789',
@@ -119,6 +121,20 @@ class TestAPIClient(object):
             'std':std,
         }
         res = requests.get(self.reverse('gaussian-blur'),params=payload, headers=self.headers)
+
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_median_blur(self, kernel_size = 3):
+        payload = {
+            'kernel': kernel_size,
+        }
+        res = requests.get(self.reverse('median-blur'),params=payload, headers=self.headers)
 
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]

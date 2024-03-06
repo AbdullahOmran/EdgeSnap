@@ -202,3 +202,28 @@ def gaussian_blur(request):
     return Response(status = status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def median_blur(request):
+    kernel_size = request.GET.get('kernel',None)
+    if kernel_size is None:
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    kernel_size = int(kernel_size)
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.image)
+        out_file = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        filtered_image = utils.apply_median_blur(gray_image, kernel_size)
+        cv.imwrite(out_file, filtered_image)
+        user_image.save()
+        with open(out_file, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
+
+

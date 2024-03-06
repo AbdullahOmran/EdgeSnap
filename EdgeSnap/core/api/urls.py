@@ -15,4 +15,5 @@ urlpatterns = [
     path('add-salt-and-pepper-noise/', views.add_salt_and_pepper_noise,  name = 'add-salt-and-pepper-noise'),
     path('blur/', views.blur, name = 'blur'),
     path('gaussian-blur/', views.gaussian_blur, name = 'gaussian-blur'),
+    path('median-blur/', views.median_blur, name = 'median-blur'),
 ]
