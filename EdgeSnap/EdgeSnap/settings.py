@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'core',
     'rest_framework',
      'corsheaders',
-     'rest_framework_simplejwt',
+     'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -90,6 +90,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
+
     "VERIFYING_KEY": "",
     "AUDIENCE": None,
     "ISSUER": None,

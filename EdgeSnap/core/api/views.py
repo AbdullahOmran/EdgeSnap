@@ -25,7 +25,7 @@ def get_routes(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def upload_img(request):
+def upload_image(request):
     images = UserImage.objects.filter(user=request.user)
     if images.count() > 0:
         for image in images:
