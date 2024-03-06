@@ -33,3 +33,24 @@ def apply_sobel_edge_detection(gray_image):
     magnitude *= 255.0 / np.max(magnitude)
     
     return magnitude.astype(np.uint8)
+
+
+def apply_roberts_edge_detection(gray_image):
+    roberts_x = np.array([[1, 0], [0, -1]])
+    roberts_y = np.array([[0, 1], [-1, 0]])
+    gradient_x = cv.filter2D(gray_image, kernel = roberts_x,anchor=(-1,-1), ddepth = -1)
+    gradient_y = cv.filter2D(gray_image, kernel = roberts_y,anchor=(-1,-1), ddepth = -1)
+    magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
+    magnitude *= 255.0 / np.max(magnitude)
+    
+    return magnitude.astype(np.uint8)
+
+def apply_prewitt_edge_detection(gray_image):
+    prewitt_x = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+    prewitt_y = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
+    gradient_x = cv.filter2D(gray_image, kernel = prewitt_x,anchor=(-1,-1), ddepth = -1)
+    gradient_y = cv.filter2D(gray_image, kernel = prewitt_y,anchor=(-1,-1), ddepth = -1)
+    magnitude = np.sqrt(gradient_x**2 + gradient_y**2)
+    magnitude *= 255.0 / np.max(magnitude)
+    
+    return magnitude.astype(np.uint8)

@@ -17,4 +17,7 @@ urlpatterns = [
     path('gaussian-blur/', views.gaussian_blur, name = 'gaussian-blur'),
     path('median-blur/', views.median_blur, name = 'median-blur'),
     path('sobel-edge-detection/', views.sobel_edge_detection, name = 'sobel-edge-detection'),
+    path('roberts-edge-detection/', views.roberts_edge_detection, name = 'roberts-edge-detection'),
+    path('prewitt-edge-detection/', views.prewitt_edge_detection, name = 'prewitt-edge-detection'),
+    path('canny-edge-detection/', views.canny_edge_detection, name = 'canny-edge-detection'),
 ]

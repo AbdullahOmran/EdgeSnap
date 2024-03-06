@@ -21,6 +21,9 @@ class TestAPIClient(object):
             'gaussian-blur':f'{self.BASE_URL}/gaussian-blur/',
             'median-blur':f'{self.BASE_URL}/median-blur/',
             'sobel-edge-detection':f'{self.BASE_URL}/sobel-edge-detection/',
+            'roberts-edge-detection':f'{self.BASE_URL}/roberts-edge-detection/',
+            'prewitt-edge-detection':f'{self.BASE_URL}/prewitt-edge-detection/',
+            'canny-edge-detection':f'{self.BASE_URL}/canny-edge-detection/',
         }
 
         res = requests.post(self.reverse('token'), data={
@@ -147,6 +150,40 @@ class TestAPIClient(object):
 
     def test_sobel_edge_detection(self):
         res = requests.get(self.reverse('sobel-edge-detection'), headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_roberts_edge_detection(self):
+        res = requests.get(self.reverse('roberts-edge-detection'), headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_prewitt_edge_detection(self):
+        res = requests.get(self.reverse('prewitt-edge-detection'), headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_canny_edge_detection(self, low_threshold = 50 , high_threshold = 150):
+        payload = {
+            'low_threshold': low_threshold,
+            'high_threshold': high_threshold,
+        }
+        res = requests.get(self.reverse('canny-edge-detection'),params=payload, headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
         img_bytes = np.frombuffer(res.content, dtype=np.uint8)

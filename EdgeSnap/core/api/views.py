@@ -246,4 +246,69 @@ def sobel_edge_detection(request):
 
     return Response(status = status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def roberts_edge_detection(request):
+    
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        edited_image = utils.apply_roberts_edge_detection(gray_image)
+        cv.imwrite(filename, edited_image)
+        user_image.save()
+        with open(filename, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def prewitt_edge_detection(request):
+    
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        edited_image = utils.apply_prewitt_edge_detection(gray_image)
+        cv.imwrite(filename, edited_image)
+        user_image.save()
+        with open(filename, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def canny_edge_detection(request):
+    low_threshold = request.GET.get('low_threshold',None)
+    high_threshold = request.GET.get('high_threshold',None)
+    if low_threshold is None or high_threshold is None:
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    low_threshold = int(low_threshold)
+    high_threshold = int(high_threshold)
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        edited_image = cv.Canny(gray_image, low_threshold, high_threshold)
+        cv.imwrite(filename, edited_image)
+        user_image.save()
+        with open(filename, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
+
 
