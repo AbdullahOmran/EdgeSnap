@@ -15,7 +15,7 @@ class TestAPIClient(object):
             'upload-image':f'{self.BASE_URL}/upload-image/',
             'get-grayscale':f'{self.BASE_URL}/get-grayscale/',
             'add-gaussian-noise':f'{self.BASE_URL}/add-gaussian-noise/',
-            'add-uniform-noise':f'{self.BASE_URL}/api/add-uniform-noise/',
+            'add-uniform-noise':f'{self.BASE_URL}/add-uniform-noise/',
             'add-salt-and-pepper-noise':f'{self.BASE_URL}/add-salt-and-pepper-noise/',
             'blur':f'{self.BASE_URL}/blur/',
             'gaussian-blur':f'{self.BASE_URL}/gaussian-blur/',

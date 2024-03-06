@@ -39,13 +39,13 @@ def upload_image(request):
 def get_grayscale(request):
     try:
         user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.image)
-        out_file = str(user_image.out_image)
+        
+        filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        cv.imwrite(out_file, gray_image)
+        cv.imwrite(filename, gray_image)
         user_image.save()
-        with open(out_file, 'rb') as f:
+        with open(filename, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
     except UserImage.DoesNotExist:
@@ -64,17 +64,17 @@ def add_gaussian_noise(request):
     std = float(std)
     try:
         user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.image)
-        out_file = str(user_image.out_image)
+        
+        filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         row,col = gray_image.shape
         noise = np.random.normal(mean,std, (row,col))
         noisy_image = gray_image + noise
         noisy_image = np.clip(noisy_image,0,255).astype(np.uint8)
-        cv.imwrite(out_file, noisy_image)
+        cv.imwrite(filename, noisy_image)
         user_image.save()
-        with open(out_file, 'rb') as f:
+        with open(filename, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
     except UserImage.DoesNotExist:
@@ -94,17 +94,17 @@ def add_uniform_noise(request):
     high = float(high)
     try:
         user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.image)
-        out_file = str(user_image.out_image)
+        
+        filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         row,col = gray_image.shape
         noise = np.random.uniform(low,high, (row,col))
         noisy_image = gray_image + noise
         noisy_image = np.clip(noisy_image,0,255).astype(np.uint8)
-        cv.imwrite(out_file, noisy_image)
+        cv.imwrite(filename, noisy_image)
         user_image.save()
-        with open(out_file, 'rb') as f:
+        with open(filename, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
     except UserImage.DoesNotExist:
@@ -121,8 +121,8 @@ def add_salt_and_pepper_noise(request):
         return Response(status = status.HTTP_400_BAD_REQUEST)
     try:
         user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.image)
-        out_file = str(user_image.out_image)
+        
+        filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         noisy_image = np.copy(gray_image)
@@ -140,9 +140,9 @@ def add_salt_and_pepper_noise(request):
             pepper_y_vector = np.random.randint(0,height, int(num_pepper))
             noisy_image[pepper_x_vector, pepper_y_vector] = 0
 
-        cv.imwrite(out_file, noisy_image)
+        cv.imwrite(filename, noisy_image)
         user_image.save()
-        with open(out_file, 'rb') as f:
+        with open(filename, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
     except UserImage.DoesNotExist:
@@ -157,16 +157,16 @@ def blur(request):
     kernel_size = int(kernel_size)
     try:
         user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.image)
-        out_file = str(user_image.out_image)
+        
+        filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         row,col = gray_image.shape
         kernel = np.ones(shape = (kernel_size, kernel_size) ) / (kernel_size**2)
         filtered_image = cv.filter2D(src = gray_image,kernel=kernel,anchor=(-1,-1), ddepth = -1)
-        cv.imwrite(out_file, filtered_image)
+        cv.imwrite(filename, filtered_image)
         user_image.save()
-        with open(out_file, 'rb') as f:
+        with open(filename, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
     except UserImage.DoesNotExist:
@@ -184,16 +184,16 @@ def gaussian_blur(request):
     std = float(std)
     try:
         user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.image)
-        out_file = str(user_image.out_image)
+        
+        filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         row,col = gray_image.shape
         kernel = utils.gaussian_kernel(kernel_size, std)
         filtered_image = cv.filter2D(src = gray_image,kernel=kernel,anchor=(-1,-1), ddepth = -1)
-        cv.imwrite(out_file, filtered_image)
+        cv.imwrite(filename, filtered_image)
         user_image.save()
-        with open(out_file, 'rb') as f:
+        with open(filename, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
     except UserImage.DoesNotExist:
@@ -211,14 +211,14 @@ def median_blur(request):
     kernel_size = int(kernel_size)
     try:
         user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.image)
-        out_file = str(user_image.out_image)
+        
+        filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         filtered_image = utils.apply_median_blur(gray_image, kernel_size)
-        cv.imwrite(out_file, filtered_image)
+        cv.imwrite(filename, filtered_image)
         user_image.save()
-        with open(out_file, 'rb') as f:
+        with open(filename, 'rb') as f:
             extension = os.path.splitext(filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
     except UserImage.DoesNotExist:
