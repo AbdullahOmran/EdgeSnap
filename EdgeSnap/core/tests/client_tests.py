@@ -4,6 +4,16 @@ import requests
 import cv2 as cv
 import numpy as np
 
+
+
+endpoints = [
+    'http://localhost:8000/api/get-grayscale/',
+    'http://localhost:8000/api/add-gaussian-noise/',
+    'http://localhost:8000/api/upload-image/',
+
+]
+
+
 res = requests.post('http://localhost:8000/api/token/', data={
     'username': 'AbdullahOmran',
     'password': '123456789',
