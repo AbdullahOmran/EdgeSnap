@@ -20,4 +20,6 @@ urlpatterns = [
     path('roberts-edge-detection/', views.roberts_edge_detection, name = 'roberts-edge-detection'),
     path('prewitt-edge-detection/', views.prewitt_edge_detection, name = 'prewitt-edge-detection'),
     path('canny-edge-detection/', views.canny_edge_detection, name = 'canny-edge-detection'),
+    path('get-histogram/', views.get_histogram, name = 'get-histogram'),
+    path('get-equalized-histogram/', views.get_equalized_histogram, name = 'get-equalized-histogram'),
 ]

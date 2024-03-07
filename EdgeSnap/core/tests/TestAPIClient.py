@@ -3,6 +3,7 @@
 import requests
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
 
 class TestAPIClient(object):
     
@@ -24,6 +25,8 @@ class TestAPIClient(object):
             'roberts-edge-detection':f'{self.BASE_URL}/roberts-edge-detection/',
             'prewitt-edge-detection':f'{self.BASE_URL}/prewitt-edge-detection/',
             'canny-edge-detection':f'{self.BASE_URL}/canny-edge-detection/',
+            'get-histogram':f'{self.BASE_URL}/get-histogram/',
+            'get-equalized-histogram':f'{self.BASE_URL}/get-equalized-histogram/',
         }
 
         res = requests.post(self.reverse('token'), data={
@@ -191,6 +194,29 @@ class TestAPIClient(object):
         cv.imshow(out_file,image)
         cv.waitKey(0)
         cv.destroyAllWindows()
+
+    def test_get_histogram(self):
+        
+        res = requests.get(self.reverse('get-histogram'), headers=self.headers)
+        
+        histogram = np.frombuffer(res.content, dtype=np.uint8)
+        
+        plt.hist(histogram, bins=256, color='blue')
+        plt.xlabel('levels')
+        plt.ylabel('Frequency')
+        plt.title('Basic Histogram')
+        plt.show()
+
+    def test_get_equalized_histogram(self):
+        
+        res = requests.get(self.reverse('get-equalized-histogram'), headers=self.headers)
+        
+        equalized_histogram = np.frombuffer(res.content, dtype=np.uint8)
+        plt.hist(equalized_histogram, bins=256, color='blue')
+        plt.xlabel('levels')
+        plt.ylabel('Frequency')
+        plt.title('Equalized Histogram')
+        plt.show()
 
 
 

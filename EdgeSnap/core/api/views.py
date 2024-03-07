@@ -311,4 +311,47 @@ def canny_edge_detection(request):
 
     return Response(status = status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_histogram(request):
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        N_LEVELS = 256
+        histogram = np.zeros(N_LEVELS, dtype=np.uint8)
+        for row in gray_image:
+            for pixel in row:
+                histogram[pixel] += 1
+        histogram_bytes = histogram.tobytes() 
+        return HttpResponse(histogram_bytes)
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_equalized_histogram(request):
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        N_LEVELS = 256
+        histogram = np.zeros(N_LEVELS, dtype=np.uint8)
+        for row in gray_image:
+            for pixel in row:
+                histogram[pixel] += 1
+        pdf_vector = histogram / np.sum(histogram)
+        cdf_vector = np.cumsum(histogram) / np.sum(histogram)
+        scaled_histogram = cdf_vector * N_LEVELS
+        equalized_histogram = np.round(scaled_histogram).astype(np.uint8).tobytes()
+        return HttpResponse(equalized_histogram)
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
+
 
