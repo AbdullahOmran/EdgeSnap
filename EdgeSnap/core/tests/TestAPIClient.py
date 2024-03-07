@@ -28,6 +28,8 @@ class TestAPIClient(object):
             'get-histogram':f'{self.BASE_URL}/get-histogram/',
             'get-equalized-histogram':f'{self.BASE_URL}/get-equalized-histogram/',
             'normalize':f'{self.BASE_URL}/normalize/',
+            'global-threshold':f'{self.BASE_URL}/global-threshold/',
+            'local-threshold':f'{self.BASE_URL}/local-threshold/',
         }
 
         res = requests.post(self.reverse('token'), data={
@@ -222,6 +224,31 @@ class TestAPIClient(object):
     def test_normalize(self):
         
         res = requests.get(self.reverse('normalize'), headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+    
+    def test_global_threshold(self, threshold = 50):
+        payload = {
+            'threshold': threshold,
+        }
+        res = requests.get(self.reverse('global-threshold'),params=payload, headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+    def test_local_threshold(self, kernel_size = 11):
+        payload = {
+            'kernel': kernel_size,
+        }
+        res = requests.get(self.reverse('local-threshold'),params=payload, headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
         img_bytes = np.frombuffer(res.content, dtype=np.uint8)
