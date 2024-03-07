@@ -3,4 +3,4 @@ from TestAPIClient import TestAPIClient
 
 client_test = TestAPIClient()
 
-client_test.test_global_threshold(threshold=200)
+client_test.test_local_threshold(kernel_size=11)
