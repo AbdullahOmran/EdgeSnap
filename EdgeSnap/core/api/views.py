@@ -354,4 +354,24 @@ def get_equalized_histogram(request):
 
     return Response(status = status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def normalize(request):
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        image_float = gray_image.astype(np.float32)
+        min_val = np.min(image_float)
+        max_val = np.max(image_float)
+        normalized_image = (image_float - min_val) / (max_val - min_val)
+        cv.imwrite(filename, normalized_image)
+        user_image.save()
+        with open(filename, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
 
+    return Response(status = status.HTTP_200_OK)

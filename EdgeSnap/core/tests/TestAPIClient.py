@@ -27,6 +27,7 @@ class TestAPIClient(object):
             'canny-edge-detection':f'{self.BASE_URL}/canny-edge-detection/',
             'get-histogram':f'{self.BASE_URL}/get-histogram/',
             'get-equalized-histogram':f'{self.BASE_URL}/get-equalized-histogram/',
+            'normalize':f'{self.BASE_URL}/normalize/',
         }
 
         res = requests.post(self.reverse('token'), data={
@@ -217,6 +218,17 @@ class TestAPIClient(object):
         plt.ylabel('Frequency')
         plt.title('Equalized Histogram')
         plt.show()
+    
+    def test_normalize(self):
+        
+        res = requests.get(self.reverse('normalize'), headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
 
 
 
