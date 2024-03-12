@@ -347,7 +347,8 @@ def get_equalized_histogram(request):
                 histogram[pixel] += 1
         pdf_vector = histogram / np.sum(histogram)
         cdf_vector = np.cumsum(histogram) / np.sum(histogram)
-        scaled_histogram = cdf_vector * (N_LEVELS-1)
+        max_level = np.max(gray_image)
+        scaled_histogram = cdf_vector * max_level
         equalized_histogram = np.round(scaled_histogram).astype(np.uint8).tobytes()
         return HttpResponse(equalized_histogram)
     except UserImage.DoesNotExist:
@@ -370,7 +371,8 @@ def get_equalized_image(request):
                 histogram[pixel] += 1
         pdf_vector = histogram / np.sum(histogram)
         cdf_vector = np.cumsum(histogram) / np.sum(histogram)
-        scaled_histogram = cdf_vector * (N_LEVELS-1)
+        max_level = np.max(gray_image)
+        scaled_histogram = cdf_vector * max_level
         equalized_histogram = np.round(scaled_histogram)
         equalized_image = np.copy(gray_image)
         for i in range(len(gray_image)):
