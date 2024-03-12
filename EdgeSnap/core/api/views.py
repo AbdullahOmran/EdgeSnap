@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import MyTokenObtainPairSerializer
 from django.http import HttpResponse
-from ..models import UserImage
+from ..models import UserImage, HybridImageComponents
 from rest_framework import status
 import cv2 as cv
 import numpy as np
@@ -484,9 +484,23 @@ def local_threshold(request):
 @permission_classes([IsAuthenticated])
 def get_hybrid_image(request):
     filter_radius = request.GET.get('radius',None)
-    if kernel_size is None:
+    first_filter_type = request.GET.get('first_filter_type',None)
+    second_filter_type = request.GET.get('second_filter_type',None)
+    first_image = request.FILES.get('first_image')
+    second_image = request.FILES.get('second_image')
+    images = HybridImageComponents.objects.filter(user=request.user)
+    if images.count() > 0:
+        for image in images:
+            image.delete()
+    instance = HybridImageComponents(user=request.user, first_image = first_image, second_image = second_image)
+
+    if filter_radius is None or \
+        first_filter_type is None or \
+        second_filter_type is None:
         return Response(status = status.HTTP_400_BAD_REQUEST)
-    kernel_size = int(kernel_size)
+    filter_radius = int(filter_radius)
+    first_filter_type = str(first_filter_type)
+    second_filter_type = str(second_filter_type)
     try:
         user_image = UserImage.objects.get(user = request.user)
         filename = str(user_image.out_image)
