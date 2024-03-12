@@ -479,3 +479,27 @@ def local_threshold(request):
         return Response(status = status.HTTP_404_NOT_FOUND)
 
     return Response(status = status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_hybrid_image(request):
+    filter_radius = request.GET.get('radius',None)
+    if kernel_size is None:
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    kernel_size = int(kernel_size)
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        SUBTRACTED_FROM_MEAN = 2
+        local_thresholded = cv.adaptiveThreshold(gray_image, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, kernel_size, SUBTRACTED_FROM_MEAN)
+        cv.imwrite(filename, local_thresholded)
+        user_image.save()
+        with open(filename, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
