@@ -322,6 +322,13 @@ def canny_edge_detection(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_histogram(request):
+    channel = request.GET.get('channel',None)
+    image_type = request.GET.get('image_type',None)
+    if channel is None or image_type is None:
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    channel = int(channel)
+    image_type = str(image_type)
+
     try:
         user_image = UserImage.objects.get(user = request.user)
         filename = str(user_image.out_image)
@@ -329,9 +336,14 @@ def get_histogram(request):
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         N_LEVELS = 256
         histogram = np.zeros(N_LEVELS, dtype=np.uint8)
-        for row in gray_image:
-            for pixel in row:
-                histogram[pixel] += 1
+        if image_type == 'gray':
+            for row in gray_image:
+                for pixel in row:
+                    histogram[pixel] += 1
+        elif image_type == 'rgb':
+            for row in img:
+                for pixel in row:
+                    histogram[pixel[channel]] += 1
         histogram_bytes = histogram.tobytes() 
         return HttpResponse(histogram_bytes)
     except UserImage.DoesNotExist:
