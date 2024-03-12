@@ -200,9 +200,12 @@ class TestAPIClient(object):
         cv.waitKey(0)
         cv.destroyAllWindows()
 
-    def test_get_histogram(self):
-        
-        res = requests.get(self.reverse('get-histogram'), headers=self.headers)
+    def test_get_histogram(self, channel = 0, image_type = 'gray'):
+        payload = {
+            'channel': channel,
+            'image_type': image_type,
+        }
+        res = requests.get(self.reverse('get-histogram'),params=payload, headers=self.headers)
         
         histogram = np.frombuffer(res.content, dtype=np.uint8)
         
