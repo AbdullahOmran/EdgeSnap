@@ -54,3 +54,8 @@ def apply_prewitt_edge_detection(gray_image):
     magnitude *= 255.0 / np.max(magnitude)
     
     return magnitude.astype(np.uint8)
+    
+def rgb_to_gray(pixel):
+    # Convert RGB pixel to grayscale using luminosity method
+    # Gray = 0.299 * R + 0.587 * G + 0.114 * B
+    return int(0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2])

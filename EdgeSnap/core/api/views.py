@@ -42,8 +42,15 @@ def get_grayscale(request):
         user_image = UserImage.objects.get(user = request.user)
         
         filename = str(user_image.out_image)
-        img = cv.imread(filename)
-        gray_image = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        image = cv.imread(filename)
+        gray_image  = np.zeros(shape = (image.shape[0], image.shape[1]), dtype = np.uint8)
+        for x in range(image.shape[0]):
+            for y in range(image.shape[1]):
+                R = image[x,y,0]
+                G = image[x,y,1]
+                B = image[x,y,2]
+                gray_image[x,y] = utils.rgb_to_gray((R,G,B))
+
         cv.imwrite(filename, gray_image)
         user_image.save()
         with open(filename, 'rb') as f:
