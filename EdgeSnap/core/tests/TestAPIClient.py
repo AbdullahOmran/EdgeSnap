@@ -27,9 +27,11 @@ class TestAPIClient(object):
             'canny-edge-detection':f'{self.BASE_URL}/canny-edge-detection/',
             'get-histogram':f'{self.BASE_URL}/get-histogram/',
             'get-equalized-histogram':f'{self.BASE_URL}/get-equalized-histogram/',
+            'get-equalized-image':f'{self.BASE_URL}/get-equalized-image/',
             'normalize':f'{self.BASE_URL}/normalize/',
             'global-threshold':f'{self.BASE_URL}/global-threshold/',
             'local-threshold':f'{self.BASE_URL}/local-threshold/',
+            
         }
 
         res = requests.post(self.reverse('token'), data={
@@ -249,6 +251,17 @@ class TestAPIClient(object):
             'kernel': kernel_size,
         }
         res = requests.get(self.reverse('local-threshold'),params=payload, headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_get_equalized_image(self):
+        
+        res = requests.get(self.reverse('get-equalized-image'), headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
         img_bytes = np.frombuffer(res.content, dtype=np.uint8)

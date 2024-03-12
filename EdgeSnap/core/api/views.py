@@ -10,6 +10,7 @@ import cv2 as cv
 import numpy as np
 import os
 from . import utils
+import pandas as pd
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
@@ -346,13 +347,46 @@ def get_equalized_histogram(request):
                 histogram[pixel] += 1
         pdf_vector = histogram / np.sum(histogram)
         cdf_vector = np.cumsum(histogram) / np.sum(histogram)
-        scaled_histogram = cdf_vector * N_LEVELS
+        scaled_histogram = cdf_vector * (N_LEVELS-1)
         equalized_histogram = np.round(scaled_histogram).astype(np.uint8).tobytes()
         return HttpResponse(equalized_histogram)
     except UserImage.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
     return Response(status = status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_equalized_image(request):
+    try:
+        user_image = UserImage.objects.get(user = request.user)
+        filename = str(user_image.out_image)
+        img = cv.imread(filename)
+        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        N_LEVELS = 256
+        histogram = np.zeros(N_LEVELS, dtype=np.uint8)
+        for row in gray_image:
+            for pixel in row:
+                histogram[pixel] += 1
+        pdf_vector = histogram / np.sum(histogram)
+        cdf_vector = np.cumsum(histogram) / np.sum(histogram)
+        scaled_histogram = cdf_vector * (N_LEVELS-1)
+        equalized_histogram = np.round(scaled_histogram)
+        equalized_image = np.copy(gray_image)
+        for i in range(len(gray_image)):
+            for j in range(len(gray_image[i])):
+                equalized_image[i][j]= equalized_histogram[gray_image[i][j]]
+        equalized_image = equalized_image.astype(np.uint8)
+        cv.imwrite(filename, equalized_image)
+        user_image.save()
+        with open(filename, 'rb') as f:
+            extension = os.path.splitext(filename)[1] 
+            return HttpResponse(f, content_type='image/'+ extension[1:])
+    except UserImage.DoesNotExist:
+        return Response(status = status.HTTP_404_NOT_FOUND)
+
+    return Response(status = status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
