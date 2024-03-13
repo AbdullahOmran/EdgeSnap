@@ -480,12 +480,11 @@ def local_threshold(request):
 
     return Response(status = status.HTTP_200_OK)
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def get_hybrid_image(request):
-    filter_radius = request.GET.get('radius',None)
-    first_filter_type = request.GET.get('first_filter_type',None)
-    second_filter_type = request.GET.get('second_filter_type',None)
+    low_pass_cuttoff_freq = request.POST.get('low_pass_cuttoff_freq',None)
+    high_pass_cuttoff_freq = request.POST.get('high_pass_cuttoff_freq',None)
     first_image = request.FILES.get('first_image')
     second_image = request.FILES.get('second_image')
     images = HybridImageComponents.objects.filter(user=request.user)
@@ -493,27 +492,49 @@ def get_hybrid_image(request):
         for image in images:
             image.delete()
     instance = HybridImageComponents(user=request.user, first_image = first_image, second_image = second_image)
+    instance.save()
 
-    if filter_radius is None or \
-        first_filter_type is None or \
-        second_filter_type is None:
+    if low_pass_cuttoff_freq is None or \
+        high_pass_cuttoff_freq is None:
         return Response(status = status.HTTP_400_BAD_REQUEST)
-    filter_radius = int(filter_radius)
-    first_filter_type = str(first_filter_type)
-    second_filter_type = str(second_filter_type)
+    low_pass_cuttoff_freq = int(low_pass_cuttoff_freq)
+    high_pass_cuttoff_freq = int(high_pass_cuttoff_freq)
     try:
-        user_image = UserImage.objects.get(user = request.user)
-        filename = str(user_image.out_image)
-        img = cv.imread(filename)
-        gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        SUBTRACTED_FROM_MEAN = 2
-        local_thresholded = cv.adaptiveThreshold(gray_image, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, kernel_size, SUBTRACTED_FROM_MEAN)
-        cv.imwrite(filename, local_thresholded)
-        user_image.save()
-        with open(filename, 'rb') as f:
-            extension = os.path.splitext(filename)[1] 
+        hybrid_image = HybridImageComponents.objects.get(user = request.user)
+        first_filename = str(hybrid_image.first_image)
+        second_filename = str(hybrid_image.second_image)
+        first_image = cv.cvtColor(cv.imread(first_filename),cv.COLOR_BGR2GRAY)
+        second_image = cv.cvtColor(cv.imread(second_filename),cv.COLOR_BGR2GRAY)
+
+        f_transform_1 = np.fft.fft2(first_image)
+        f_shift_1 = np.fft.fftshift(f_transform_1)
+        f_transform_2 = np.fft.fft2(second_image)
+        f_shift_2 = np.fft.fftshift(f_transform_2)
+
+        rows_1, cols_1 = first_image.shape
+        # center the image
+        crow_1, ccol_1 = rows_1 // 2, cols_1 // 2
+        low_pass_filter = np.zeros((rows_1, cols_1), np.uint8)
+        low_pass_filter[crow_1 - low_pass_cuttoff_freq:crow_1 + low_pass_cuttoff_freq, ccol_1 - low_pass_cuttoff_freq:ccol_1 + low_pass_cuttoff_freq] = 1
+        f_shift_filtered_1 = f_shift_1 * low_pass_filter
+
+        rows_2, cols_2 = second_image.shape
+        # center the image
+        crow_2, ccol_2 = rows_2 // 2, cols_2 // 2
+        high_pass_filter = np.ones((rows_2, cols_2), np.uint8)
+        high_pass_filter[crow_2 - high_pass_cuttoff_freq:crow_2 + high_pass_cuttoff_freq, ccol_2 - high_pass_cuttoff_freq:ccol_2 + high_pass_cuttoff_freq] = 0
+        f_shift_filtered_2 = f_shift_2 * high_pass_filter
+        f_shift_filtered = f_shift_filtered_1 + f_shift_filtered_2
+
+        f_ishift = np.fft.ifftshift(f_shift_filtered)
+        img_back = np.fft.ifft2(f_ishift)
+        img_back = np.abs(img_back)
+        out_filename = 'images/hybrid_' + hybrid_image.user.username+'.jpg'
+        cv.imwrite(out_filename, img_back)
+        with open(out_filename, 'rb') as f:
+            extension = os.path.splitext(out_filename)[1] 
             return HttpResponse(f, content_type='image/'+ extension[1:])
-    except UserImage.DoesNotExist:
+    except HybridImageComponents.DoesNotExist:
         return Response(status = status.HTTP_404_NOT_FOUND)
 
     return Response(status = status.HTTP_200_OK)

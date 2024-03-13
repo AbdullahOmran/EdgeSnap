@@ -15,6 +15,7 @@ class HybridImageComponents(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     first_image = models.ImageField(upload_to='images/', null=True, blank=True)
     second_image = models.ImageField(upload_to='images/', null=True, blank=True)
+    
 
 @receiver(pre_delete, sender=UserImage)
 def delete_image(sender, instance, **kwargs):
