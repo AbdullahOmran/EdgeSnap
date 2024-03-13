@@ -31,6 +31,7 @@ class TestAPIClient(object):
             'normalize':f'{self.BASE_URL}/normalize/',
             'global-threshold':f'{self.BASE_URL}/global-threshold/',
             'local-threshold':f'{self.BASE_URL}/local-threshold/',
+            'get-hybrid-image':f'{self.BASE_URL}/get-hybrid-image/',
             
         }
 
@@ -265,6 +266,24 @@ class TestAPIClient(object):
     def test_get_equalized_image(self):
         
         res = requests.get(self.reverse('get-equalized-image'), headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        cv.imshow(out_file,image)
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+
+    def test_get_hybrid_image(self):
+        data = {
+            'low_pass_cuttoff_freq':100,
+            'high_pass_cuttoff_freq':100
+        }
+        files = {
+            'first_image': open(r"C:\Users\Abdullah Omran\Pictures\Screenshots\Screenshot (7).png",'rb'),
+            'second_image': open(r"G:\my-projects\centrifuge-web-app\public\images\drug_img.jpg",'rb'),
+        }
+        res = requests.post(self.reverse('get-hybrid-image'),data=data,files = files, headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
         img_bytes = np.frombuffer(res.content, dtype=np.uint8)
