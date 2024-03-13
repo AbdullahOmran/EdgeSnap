@@ -276,8 +276,8 @@ class TestAPIClient(object):
 
     def test_get_hybrid_image(self):
         data = {
-            'low_pass_cuttoff_freq':100,
-            'high_pass_cuttoff_freq':100
+            'low_pass_cuttoff_freq':50,
+            'high_pass_cuttoff_freq':50
         }
         files = {
             'first_image': open(r"C:\Users\Abdullah Omran\Pictures\Screenshots\Screenshot (7).png",'rb'),
