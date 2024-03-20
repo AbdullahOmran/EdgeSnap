@@ -247,15 +247,14 @@ class APIClient(object):
         return pixmap
     
     def normalize(self):
-        pass
-        # res = requests.get(self.reverse('normalize'), headers=self.headers)
-        # index = res.headers.get('Content-Type').find('/')+1
-        # out_file = 'output.'+res.headers.get('Content-Type')[index:]
-        # img_bytes = np.frombuffer(res.content, dtype=np.uint8)
-        # image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
-        # cv.imshow(out_file,image)
-        # cv.waitKey(0)
-        # cv.destroyAllWindows()
+        res = requests.get(self.reverse('normalize'), headers=self.headers)
+        index = res.headers.get('Content-Type').find('/')+1
+        out_file = 'output.'+res.headers.get('Content-Type')[index:]
+        img_bytes = np.frombuffer(res.content, dtype=np.uint8)
+        image =cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        qimage = QImage.fromData(img_bytes)
+        pixmap = QPixmap.fromImage(qimage)
+        return pixmap
     
     def global_threshold(self, threshold = 50):
         payload = {
