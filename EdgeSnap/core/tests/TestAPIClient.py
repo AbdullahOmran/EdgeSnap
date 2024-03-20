@@ -48,7 +48,7 @@ class TestAPIClient(object):
         }
 
         self.files = {
-            'image': open(r"G:\my-projects\centrifuge-web-app\public\images\drug_img.jpg",'rb')
+            'image': open(r"C:\Users\elnag\cv_task1\EdgeSnap\EdgeSnap\images\Screenshot_7.png",'rb')
         }
 
         res = requests.post(self.reverse('upload-image'), files=self.files, headers=self.headers)
@@ -112,7 +112,7 @@ class TestAPIClient(object):
         cv.imshow(out_file,image)
         cv.waitKey(0)
         cv.destroyAllWindows()
-
+    # average filter smothing 
     def test_blur(self, kernel_size = 3):
         payload = {
             'kernel': kernel_size,

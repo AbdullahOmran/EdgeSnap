@@ -41,7 +41,28 @@ class APIClient(object):
         self.headers = None
 
     def login(self, username,password):
+        """
+    Logs the user into the system using the provided credentials.
 
+    Parameters:
+        username (str): The username of the user.
+        password (str): The password of the user.
+
+    Returns:
+        bool: True if the login was successful and the access token was obtained, False otherwise.
+
+    Raises:
+        requests.exceptions.RequestException: If there is an error during the HTTP request.
+
+    Usage:
+        client = YourClientClass()
+        username = "example_user"
+        password = "example_password"
+        if client.login(username, password):
+            print("Login successful!")
+        else:
+            print("Login failed. Please check your credentials.")
+    """ 
         res = requests.post(self.reverse('token'), data={
             'username': username,
             'password': password,
@@ -59,6 +80,15 @@ class APIClient(object):
         return True
 
     def upload_image(self,filename):
+        """
+    Uploads an image file to the server.
+
+    Parameters:
+        filename (str): The path to the image file to be uploaded.
+
+    Raises:
+        requests.exceptions.RequestException: If there is an error during the HTTP request.
+    """
         self.files = {
             'image': open(filename,'rb')
         }
@@ -66,9 +96,26 @@ class APIClient(object):
         res = requests.post(self.reverse('upload-image'), files=self.files, headers=self.headers)
 
     def reverse(self,endpoint):
+        """
+    Retrieves the URL associated with the specified endpoint.
+
+    Parameters:
+        endpoint (str): The endpoint for which the URL is to be retrieved.
+
+    Returns:
+        str: The URL associated with the specified endpoint.
+    """
+        
         return self.endpoints.get(endpoint)
 
     def get_grayscale(self):
+        """
+    Retrieves the grayscale version of an image from the server.
+
+    Returns:
+        QPixmap: A QPixmap object representing the grayscale image.
+    """
+        
         res = requests.get(self.reverse('get-grayscale'), headers=self.headers)
 
         index = res.headers.get('Content-Type').find('/')+1
@@ -80,7 +127,17 @@ class APIClient(object):
         return pixmap
         
 
-    def add_gaussian_noise(self,mean=1, std=50):
+    def add_gaussian_noise(self,mean, std):
+        """
+    Adds Gaussian noise to an image retrieved from the server.
+
+    Parameters:
+        mean (float): The mean of the Gaussian distribution.
+        std (float): The standard deviation of the Gaussian distribution.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image with added Gaussian noise.
+    """
         payload = {
             'mean': mean,
             'std': std,
@@ -94,10 +151,20 @@ class APIClient(object):
         pixmap = QPixmap.fromImage(qimage)
         return pixmap
 
-    def add_uniform_noise(self, low = 0, high = 50):
+    def add_uniform_noise(self, low , high):
+        """
+    Adds uniform noise to an image retrieved from the server.
+
+    Parameters:
+        low (int): The lower bound of the uniform distribution.
+        high (int): The upper bound of the uniform distribution.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image with added uniform noise.
+    """
         payload = {
             'low': low,
-            'high': high
+            'high':high
         }
         res = requests.get(self.reverse('add-uniform-noise'),params=payload, headers=self.headers)
 
@@ -109,6 +176,17 @@ class APIClient(object):
         return pixmap
 
     def add_salt_and_pepper_noise(self, saltiness = 0.5, pepperiness = 0.5):
+        """
+    Adds salt and pepper noise to an image retrieved from the server.
+
+    Parameters:
+        saltiness (float): The probability of adding salt noise to each pixel.
+        pepperiness (float): The probability of adding pepper noise to each pixel.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image with added salt and pepper noise.
+    """
+     
         payload = {
             'saltiness': saltiness,
             'pepperiness': pepperiness
@@ -123,6 +201,17 @@ class APIClient(object):
         return pixmap
 
     def blur(self, kernel_size = 3):
+        """
+    Applies a blur filter to an image retrieved from the server.
+
+    Parameters:
+        kernel_size (int): The size of the blur kernel.
+
+    Returns:
+        QPixmap: A QPixmap object representing the blurred image.
+    """
+        
+        
         payload = {
             'kernel': kernel_size,
 
@@ -137,6 +226,16 @@ class APIClient(object):
         return pixmap
 
     def gaussian_blur(self, kernel_size = 3, std = 1):
+        """
+    Applies Gaussian blur to an image retrieved from the server.
+
+    Parameters:
+        kernel_size (int): The size of the Gaussian kernel.
+        std (float): The standard deviation of the Gaussian distribution.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image with Gaussian blur applied.
+    """
         payload = {
             'kernel': kernel_size,
             'std':std,
@@ -151,6 +250,16 @@ class APIClient(object):
         return pixmap
 
     def median_blur(self, kernel_size = 3):
+        """
+    Applies median blur to an image retrieved from the server.
+
+    Parameters:
+        kernel_size (int): The size of the kernel for median filtering.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image with median blur applied.
+    """
+        
         payload = {
             'kernel': kernel_size,
         }
@@ -164,6 +273,12 @@ class APIClient(object):
         return pixmap
 
     def sobel_edge_detection(self):
+        """
+    Performs Sobel edge detection on an image retrieved from the server.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image after Sobel edge detection.
+    """
         res = requests.get(self.reverse('sobel-edge-detection'), headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
@@ -173,6 +288,12 @@ class APIClient(object):
         return pixmap
 
     def roberts_edge_detection(self):
+        """
+    Performs Roberts edge detection on an image retrieved from the server.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image after Roberts edge detection.
+    """
         res = requests.get(self.reverse('roberts-edge-detection'), headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
@@ -182,6 +303,12 @@ class APIClient(object):
         return pixmap
 
     def prewitt_edge_detection(self):
+        """
+    Performs Prewitt edge detection on an image retrieved from the server.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image after Prewitt edge detection.
+    """
         res = requests.get(self.reverse('prewitt-edge-detection'), headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
         out_file = 'output.'+res.headers.get('Content-Type')[index:]
@@ -191,6 +318,16 @@ class APIClient(object):
         return pixmap
 
     def canny_edge_detection(self, low_threshold = 50 , high_threshold = 150):
+        """
+    Performs Canny edge detection on an image retrieved from the server.
+
+    Parameters:
+        low_threshold (int): The lower threshold for the Canny edge detector.
+        high_threshold (int): The upper threshold for the Canny edge detector.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image after Canny edge detection.
+    """
         payload = {
             'low_threshold': low_threshold,
             'high_threshold': high_threshold,
@@ -204,6 +341,16 @@ class APIClient(object):
         return pixmap
 
     def get_histogram(self, channel = 0, image_type = 'gray'):
+        """
+    Retrieves the histogram of an image from the server.
+
+    Parameters:
+        channel (int): The channel for which to compute the histogram.
+        image_type (str): The type of the image ('gray' or 'color').
+
+    Returns:
+        QPixmap: A QPixmap object representing the histogram of the image.
+    """
         payload = {
             'channel': channel,
             'image_type': image_type,
@@ -228,6 +375,12 @@ class APIClient(object):
         
 
     def get_equalized_histogram(self):
+        """
+    Retrieves the equalized histogram of an image from the server.
+
+    Returns:
+        QPixmap: A QPixmap object representing the equalized histogram of the image.
+    """
         
         res = requests.get(self.reverse('get-equalized-histogram'), headers=self.headers)
         
@@ -257,6 +410,15 @@ class APIClient(object):
         # cv.destroyAllWindows()
     
     def global_threshold(self, threshold = 50):
+        """
+    Applies global thresholding to an image retrieved from the server.
+
+    Parameters:
+        threshold (int): The threshold value for global thresholding.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image after global thresholding.
+    """
         payload = {
             'threshold': threshold,
         }
@@ -270,6 +432,15 @@ class APIClient(object):
         return pixmap
 
     def local_threshold(self, kernel_size = 11):
+        """
+    Applies local thresholding to an image retrieved from the server.
+
+    Parameters:
+        kernel_size (int): The size of the kernel for local thresholding.
+
+    Returns:
+        QPixmap: A QPixmap object representing the image after local thresholding.
+    """
         payload = {
             'kernel': kernel_size,
         }
@@ -282,6 +453,12 @@ class APIClient(object):
         return pixmap
 
     def get_equalized_image(self):
+        """
+    Retrieves the equalized version of an image from the server.
+
+    Returns:
+        QPixmap: A QPixmap object representing the equalized image.
+    """
         
         res = requests.get(self.reverse('get-equalized-image'), headers=self.headers)
         index = res.headers.get('Content-Type').find('/')+1
@@ -292,6 +469,18 @@ class APIClient(object):
         return pixmap
 
     def get_hybrid_image(self,filename_1,filename_2,low_pass_cuttoff_freq, high_pass_cuttoff_freq ):
+        """
+    Retrieves a hybrid image generated from two input images.
+
+    Parameters:
+        filename_1 (str): The path to the first input image file.
+        filename_2 (str): The path to the second input image file.
+        low_pass_cuttoff_freq (float): The cutoff frequency for the low-pass filter.
+        high_pass_cuttoff_freq (float): The cutoff frequency for the high-pass filter.
+
+    Returns:
+        QPixmap: A QPixmap object representing the hybrid image.
+    """
         data = {
             'low_pass_cuttoff_freq':low_pass_cuttoff_freq,
             'high_pass_cuttoff_freq':high_pass_cuttoff_freq
