@@ -417,10 +417,10 @@ def normalize(request):
         filename = str(user_image.out_image)
         img = cv.imread(filename)
         gray_image  = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        image_float = gray_image.astype(np.float32)
-        min_val = np.min(image_float)
-        max_val = np.max(image_float)
-        normalized_image = (image_float - min_val) / (max_val - min_val)
+        mean = np.mean(gray_image)
+        sigma = np.std(gray_image)
+        normalized_image = (gray_image - mean) / sigma
+        normalized_image = normalized_image.astype(np.uint8)
         cv.imwrite(filename, normalized_image)
         user_image.save()
         with open(filename, 'rb') as f:
@@ -505,7 +505,8 @@ def get_hybrid_image(request):
         second_filename = str(hybrid_image.second_image)
         first_image = cv.cvtColor(cv.imread(first_filename),cv.COLOR_BGR2GRAY)
         second_image = cv.cvtColor(cv.imread(second_filename),cv.COLOR_BGR2GRAY)
-
+        first_image = cv2.resize(first_image, (300, 400))
+        second_image = cv2.resize(second_image, (300, 400))
         f_transform_1 = np.fft.fft2(first_image)
         f_shift_1 = np.fft.fftshift(f_transform_1)
         f_transform_2 = np.fft.fft2(second_image)
