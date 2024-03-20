@@ -3,4 +3,4 @@ from TestAPIClient import TestAPIClient
 
 client_test = TestAPIClient()
 
-client_test.test_normalize()
+client_test.test_get_cdf_distribution()

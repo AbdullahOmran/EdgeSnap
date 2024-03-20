@@ -27,4 +27,5 @@ urlpatterns = [
     path('global-threshold/', views.global_threshold, name = 'global-threshold'),
     path('local-threshold/', views.local_threshold, name = 'local-threshold'),
     path('get-hybrid-image/', views.get_hybrid_image, name = 'get-hybrid-image'),
+    path('get-cdf-distribution/', views.get_cdf_distribution, name = 'get-cdf-distribution'),
 ]

@@ -35,6 +35,7 @@ class APIClient(object):
             'global-threshold':f'{self.BASE_URL}/global-threshold/',
             'local-threshold':f'{self.BASE_URL}/local-threshold/',
             'get-hybrid-image':f'{self.BASE_URL}/get-hybrid-image/',
+            'get-cdf-distribution':f'{self.BASE_URL}/get-cdf-distribution/',
             
         }
 
@@ -306,6 +307,24 @@ class APIClient(object):
         img_bytes = np.frombuffer(res.content, dtype=np.uint8)
         qimage = QImage.fromData(img_bytes)
         pixmap = QPixmap.fromImage(qimage)
+        return pixmap
+    def get_cdf_distribution(self):
+        
+        res = requests.get(self.reverse('get-cdf-distribution'), headers=self.headers)
+        
+        cdf_distribution = np.frombuffer(res.content, dtype=np.float32)
+        
+        plt.plot(cdf_distribution)
+        plt.xlabel('levels')
+        plt.ylabel('cdf')
+        plt.title('Distribution')
+        buffer = BytesIO()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0) 
+        image_bytes = buffer.getvalue()
+        qimage = QImage.fromData(image_bytes)
+        pixmap = QPixmap.fromImage(qimage)
+        plt.close()
         return pixmap
 
 

@@ -32,6 +32,7 @@ class TestAPIClient(object):
             'global-threshold':f'{self.BASE_URL}/global-threshold/',
             'local-threshold':f'{self.BASE_URL}/local-threshold/',
             'get-hybrid-image':f'{self.BASE_URL}/get-hybrid-image/',
+            'get-cdf-distribution':f'{self.BASE_URL}/get-cdf-distribution/',
             
         }
 
@@ -291,6 +292,18 @@ class TestAPIClient(object):
         cv.imshow(out_file,image)
         cv.waitKey(0)
         cv.destroyAllWindows()
+
+    def test_get_cdf_distribution(self):
+        
+        res = requests.get(self.reverse('get-cdf-distribution'), headers=self.headers)
+        
+        cdf_distribution = np.frombuffer(res.content, dtype=np.float32)
+        
+        plt.plot(cdf_distribution)
+        plt.xlabel('levels')
+        plt.ylabel('cdf')
+        plt.title('Distribution')
+        plt.show()
 
 
 
